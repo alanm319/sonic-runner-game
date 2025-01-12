@@ -1,5 +1,7 @@
 import k from "../kaplayCtx";
-import { makeSonic } from "../entities/sonic";
+import {makeSonic} from "../entities/sonic";
+import {makeMotobug}  from "../entities/motobug";
+import {makeRing} from "../entities/ring";
 export default function game() {
     k.setGravity(3100);
 
@@ -18,11 +20,65 @@ export default function game() {
     const sonic = makeSonic(k.vec2(200, 745));
     sonic.setControls();
     sonic.setEvents();
+    sonic.onCollide("enemy", (enemy) => {
+        if (!sonic.isGrounded()) {
+            k.play("destroy", { volume: 0.5});
+            k.play("hyper-ring", {volume: 0.5});
+            k.destroy(enemy);
+            sonic.play("jump");
+            sonic.jump();
+            return;
+        }
+        k.play("hurt", {volume: 0.5});
+        k.go("gameover");
+    });
+    sonic.onCollide("ring", (ring) => {
+        k.play("ring", {volume: 0.5});
+        k.destroy(ring);
+    });
     
     let gameSpeed = 300;
     k.loop(1, () => {
         gameSpeed += 50;
     });
+
+    const spawnMotobug = () => {
+        const motobug = makeMotobug(k.vec2(1950, 773));
+        motobug.onUpdate( () => {
+            if (gameSpeed < 3000) {
+                motobug.move(-(gameSpeed + 300), 0);
+                return;
+            }
+            motobug.move(-gameSpeed, 0);
+        });
+
+        motobug.onExitScreen(() => {
+            if (motobug.pos.x < 0) {
+                k.destroy(motobug);
+            }
+        });
+
+        const waitTime = k.rand(0.5, 2.5);
+        k.wait(waitTime, spawnMotobug)
+    };
+    spawnMotobug();
+
+    const spawnRing = () => {
+        const ring = makeRing(k.vec2(1950, 745));
+        ring.onUpdate( () => {
+            ring.move(-gameSpeed, 0);
+        });
+
+        ring.onExitScreen(() => {
+            if (ring.pos.x < 0) {
+                k.destroy(ring);
+            }
+        });
+
+        const waitTime = k.rand(0.5, 3);
+        k.wait(waitTime, spawnRing)
+    };
+    spawnRing();
 
     k.add([
         k.rect(1920, 3000),

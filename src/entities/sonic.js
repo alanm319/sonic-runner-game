@@ -1,7 +1,7 @@
 import k from "../kaplayCtx";
 
 export function makeSonic(pos) {
-    const sonic = k.add([
+    return k.add([
         k.sprite("sonic", {anim: "run"}),
         k.scale(4),
         k.area(),
@@ -25,5 +25,4 @@ export function makeSonic(pos) {
             },
         },
     ]);
-    return sonic;
 }
