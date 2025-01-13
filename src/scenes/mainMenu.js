@@ -1,10 +1,13 @@
 import k from "../kaplayCtx";
 import { makeSonic } from "../entities/sonic";
 export default function mainMenu() {
+
+    const citySfx = k.play("live_and_learn", {volume:0.4, loop: true});
+    
     if (!k.getData("best-score")) {
         k.setData("best-score", 0);
     }
-    k.onButtonPress("jump", () => k.go("game"));
+    k.onButtonPress("jump", () => k.go("game", citySfx));
 
     const bgPieceWidth = 1920;
     const bgPieces = [
@@ -20,12 +23,13 @@ export default function mainMenu() {
 
     k.add([
         k.text("SONIC RING RUN", {font: "mania", size: 96}),
+        k.color(0,0,255),
         k.pos(k.center().x, 200),
         k.anchor("center"),
     ]);
 
     k.add([
-        k.text("Press any button to start", {font: "mania", size: 32}),
+        k.text("Press any button to start", {font: "mania", size: 32  }),
         k.anchor("center"),
         k.pos(k.center().x, 400),
     ]);
